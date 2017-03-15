@@ -2,7 +2,29 @@ import React, { Component } from 'react';
 import { Button, Table } from 'react-bootstrap';
 
 export default class Products extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      products: []
+    };
+  }
+
+  componentDidMount() {
+    fetch('/api/products')
+      .then(response => response.json())
+      .then(products => this.setState({ products }));
+  }
+
   render() {
+    const products = this.state.products.map(product =>
+      <tr key={product.id}>
+        <td>{product.id}</td>
+        <td>{product.name}</td>
+        <td>{product.price}</td>
+      </tr>
+    );
+
     return (
       <div className="container" >
         <h1 style={{ fontWeight: 600, float: 'left' }}>Product list</h1>
@@ -17,16 +39,7 @@ export default class Products extends Component {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
-              <td>Name Name</td>
-              <td>505</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Name Name</td>
-              <td>555</td>
-            </tr>
+            {products}
           </tbody>
         </Table>
       </div>

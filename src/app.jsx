@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 
 import 'react-select/dist/react-select.css';
 
-import Header from './Header';
+import Header from './Header.jsx';
 import Products from './Products';
 import Customers from './Customers';
 
@@ -15,9 +15,9 @@ class App extends Component {
         <div>
           <Header />
 
-          <Route exact path="/" component={Products}/>
-          <Route path="/products" component={Products}/>
-          <Route path="/customers" component={Customers}/>
+          <Route exact path="/" component={Products} />
+          <Route path="/products" component={Products} />
+          <Route path="/customers" component={Customers} />
         </div>
       </Router>
     );
