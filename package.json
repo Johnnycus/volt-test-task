@@ -3,8 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node server.js",
-    "start-production": "set NODE_ENV=production&& webpack --config webpack.production.config.js --progress -p && npm start"
+    "clean": "rimraf ./public/*.*",
+    "start": "npm run clean && node server.js",
+    "start-production": "set NODE_ENV=production&& webpack --config webpack.production.config.js --progress -p && node server.js"
   },
   "dependencies": {
     "babel-runtime": "^6.3.19",
@@ -13,6 +14,7 @@
     "extract-text-webpack-plugin": "^1.0.1",
     "react": "^15.4.2",
     "react-bootstrap": "^0.30.8",
+    "react-document-title": "^2.0.2",
     "react-dom": "^15.4.2",
     "react-router-bootstrap": "^0.23.1",
     "react-router-dom": "^4.0.0",
@@ -32,6 +34,7 @@
     "css-loader": "^0.23.1",
     "html-webpack-plugin": "^2.21.0",
     "react-transform-hmr": "^1.0.1",
+    "rimraf": "^2.6.1",
     "style-loader": "^0.13.1",
     "webpack": "^1.13.0",
     "webpack-dev-middleware": "^1.2.0",

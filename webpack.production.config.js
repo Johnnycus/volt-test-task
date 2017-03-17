@@ -25,10 +25,24 @@ module.exports = {
       filename: 'index.html'
     }),
     new webpack.optimize.UglifyJsPlugin({
+      comments: false,
       compress: {
-          warnings: false
+        unused: true,
+        dead_code: true,
+        warnings: false,
+        drop_debugger: true,
+        conditionals: true,
+        evaluate: true,
+        drop_console: true,
+        sequences: true,
+        booleans: true,
+        pure_getters: true,
+        unsafe: true,
+        unsafe_comps: true,
+        screw_ie8: true
       }
     }),
+    new webpack.NoErrorsPlugin(),
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.optimize.AggressiveMergingPlugin(),

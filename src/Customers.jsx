@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { Button, Table, Modal, FormGroup, FormControl } from 'react-bootstrap';
+import DocumentTitle from 'react-document-title';
 
-import CreateModal from './CreateModal';
-import DeleteModal from './DeleteModal';
-import EditModal from './EditModal';
+import CreateModal from './Modal/CreateModal';
+import DeleteModal from './Modal/DeleteModal';
+import EditModal from './Modal/EditModal';
 
 export default class Customers extends Component {
   constructor(props) {
@@ -55,34 +56,37 @@ export default class Customers extends Component {
         <td>{customer.name}</td>
         <td>{customer.address}</td>
         <td>{customer.phone}</td>
-        <td><a onClick={this.openModal.bind(this, customer)}>edit</a></td>
-        <td><a onClick={this.openModal.bind(this, customer.id)}>delete</a></td>
+        <td><a onClick={this.openModal.bind(this, customer)}>edit</a>
+        &nbsp;|&nbsp;
+        <a onClick={this.openModal.bind(this, customer.id)}>delete</a></td>
       </tr>
     );
 
     return (
-      <div className="container">
-        <h1 style={{ fontWeight: 600, float: 'left' }}>Customer list</h1>
-        <Button onClick={this.openModal.bind(this, this)} style={{ marginTop: '23px', marginLeft: '25px' }}>Create</Button>
+      <DocumentTitle title='Customers'>
+        <div className="container">
+          <h1 style={{ fontWeight: 600, float: 'left' }}>Customer list</h1>
+          <Button onClick={this.openModal.bind(this, this)} style={{ marginTop: '23px', marginLeft: '25px' }}>Create</Button>
 
-        <CreateModal showModal={this.state.showModal} closeModal={this.closeModal} customers={this.state.customers} updateCustomers={this.updateCustomers} />
-        <DeleteModal showModal={this.state.showDeleteModal} closeModal={this.closeModal} customers={this.state.customers} updateCustomers={this.updateCustomers} selected={this.state.selected} />
-        <EditModal showModal={this.state.showEditModal} closeModal={this.closeModal} customers={this.state.customers} updateCustomers={this.updateCustomers} customer={this.state.customer} />
+          <CreateModal showModal={this.state.showModal} closeModal={this.closeModal} customers={this.state.customers} updateCustomers={this.updateCustomers} page='Customers' />
+          <DeleteModal showModal={this.state.showDeleteModal} closeModal={this.closeModal} customers={this.state.customers} updateCustomers={this.updateCustomers} selected={this.state.selected} page='Customers' />
+          <EditModal showModal={this.state.showEditModal} closeModal={this.closeModal} customers={this.state.customers} updateCustomers={this.updateCustomers} customer={this.state.customer} page='Customers' />
 
-        <Table responsive>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Address</th>
-              <th>Phone</th>
-            </tr>
-          </thead>
-          <tbody>
-            {customers}
-          </tbody>
-        </Table>
-      </div>
+          <Table responsive>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Phone</th>
+              </tr>
+            </thead>
+            <tbody>
+              {customers}
+            </tbody>
+          </Table>
+        </div>
+      </DocumentTitle>
     );
   }
 }
