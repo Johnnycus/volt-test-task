@@ -14,6 +14,7 @@ export default class Header extends Component {
           </Navbar.Brand>
         </Navbar.Header>
         <Nav>
+          <ListItemLink to="/invoices">Invoices</ListItemLink>
           <ListItemLink to="/products">Products</ListItemLink>
           <ListItemLink to="/customers">Customers</ListItemLink>
         </Nav>

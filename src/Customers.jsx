@@ -65,7 +65,7 @@ export default class Customers extends Component {
     return (
       <DocumentTitle title='Customers'>
         <div className="container">
-          <h1 style={{ fontWeight: 600, float: 'left' }}>Customer list</h1>
+          <h1 style={{ float: 'left' }}>Customer list</h1>
           <Button onClick={this.openModal.bind(this, this)} style={{ marginTop: '23px', marginLeft: '25px' }}>Create</Button>
 
           <CreateModal showModal={this.state.showModal} closeModal={this.closeModal} customers={this.state.customers} updateCustomers={this.updateCustomers} page='Customers' />

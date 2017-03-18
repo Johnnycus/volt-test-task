@@ -64,7 +64,7 @@ export default class Products extends Component {
     return (
       <DocumentTitle title='Products'>
         <div className="container" >
-          <h1 style={{ fontWeight: 600, float: 'left' }}>Product list</h1>
+          <h1 style={{ float: 'left' }}>Product list</h1>
           <Button onClick={this.openModal.bind(this, this)} style={{ marginTop: '23px', marginLeft: '25px' }}>Create</Button>
 
           <CreateModal showModal={this.state.showModal} closeModal={this.closeModal} products={this.state.products} updateProducts={this.updateProducts} page='Products' />
