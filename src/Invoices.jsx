@@ -11,8 +11,7 @@ export default class Invoices extends Component {
 
     this.state = {
       invoices: [],
-      selected: null,
-      showModal: false,
+      selected: undefined,
       showDeleteModal: false
     };
 
@@ -27,18 +26,11 @@ export default class Invoices extends Component {
   }
 
   openModal(selected, e) {
-    const modalType = e.target.innerHTML;
-    if (modalType === 'Create') {
-       this.setState({ showModal: true });
-    } else if (modalType === 'delete') {
-      this.setState({ showDeleteModal: true, selected });
-    } else if (modalType === 'edit') {
-      this.setState({ showEditModal: true, product: selected });
-    }
+    this.setState({ showDeleteModal: true, selected });
   }
 
   closeModal() {
-    this.setState({ showModal: false, showDeleteModal: false });
+    this.setState({ showDeleteModal: false });
   }
 
   updateInvoices(invoices) {
@@ -53,7 +45,7 @@ export default class Invoices extends Component {
         <td>{invoice.customer_id}</td>
         <td>{invoice.discount}</td>
         <td>{invoice.total}</td>
-        <td><Link to="/invoices/{{ invoice.id }}/edit">edit</Link>
+        <td><Link to={`/invoices/${invoice.id}/edit`}>edit</Link>
         &nbsp;|&nbsp;
         <a onClick={this.openModal.bind(this, invoice.id)}>delete</a></td>
       </tr>
@@ -63,8 +55,7 @@ export default class Invoices extends Component {
       <DocumentTitle title='Invoices'>
         <div className="container" >
           <h1 style={{ float: 'left' }}>Invoice list</h1>
-          <Link to="/invoices/create"
-          style={{textDecoration: 'none', color: '#000'}}>
+          <Link to="/invoices/create" style={{textDecoration: 'none', color: '#000'}}>
             <Button style={{ marginTop: '23px', marginLeft: '25px' }}>Create</Button>
           </Link>
 
@@ -81,6 +72,8 @@ export default class Invoices extends Component {
               {invoices}
             </tbody>
           </Table>
+
+          <DeleteModal closeModal={this.closeModal} showModal={this.state.showDeleteModal} selected={this.state.selected} page='invoices' />
         </div>
       </DocumentTitle>
     );

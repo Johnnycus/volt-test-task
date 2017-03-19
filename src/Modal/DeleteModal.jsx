@@ -2,37 +2,22 @@ import React, { Component } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 
 export default class DeleteModal extends Component {
-  deleteCustomer() {
-    fetch(`/api/customers/${this.props.selected}`, {
+  deleteItem() {
+    fetch(`/api/${this.props.page}/${this.props.selected}`, {
       method: 'DELETE'
     })
 
-    // Idk why, but fetch customers to show new state (customers list without deleted customer) doesn't work so just page reload here
-    // fetch('/api/customers')
-    //   .then(response => response.json())
-    //   .then(customers => this.props.updateCustomers(customers));
-    window.location.reload();
-  }
-
-  deleteProduct() {
-    fetch(`/api/products/${this.props.selected}`, {
-      method: 'DELETE'
-    })
-
-    // Idk why, but fetch products to show new state (products list without deleted product) doesn't work so just page reload here
-    // fetch('/api/products')
-    //   .then(response => response.json())
-    //   .then(products => this.props.updateProducts(products));
+    // Can't make it work in a way that after delete - new state shows up (without deleted item), so just page reload here
     window.location.reload();
   }
 
   render() {
-    const page = this.props.page;
+    const { page, selected, showModal, closeModal } = this.props;
 
     return (
-      <Modal show={this.props.showModal} onHide={this.props.closeModal}>
+      <Modal show={showModal} onHide={closeModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Delete {page === 'Customers' ? 'customer' : 'product'} #{this.props.selected}</Modal.Title>
+          <Modal.Title>Delete {page.slice(0, -1)} #{selected}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body style={{ textAlign: 'center', fontSize: '24px' }}>
@@ -40,8 +25,8 @@ export default class DeleteModal extends Component {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button bsStyle="danger" onClick={page === 'Customers' ? this.deleteCustomer.bind(this) : this.deleteProduct.bind(this)}>Delete</Button>
-          <Button onClick={this.props.closeModal}>Cancel</Button>
+          <Button bsStyle="danger" onClick={this.deleteItem.bind(this)}>Delete</Button>
+          <Button onClick={closeModal}>Cancel</Button>
         </Modal.Footer>
       </Modal>
     );

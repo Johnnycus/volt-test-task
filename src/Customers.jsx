@@ -12,11 +12,11 @@ export default class Customers extends Component {
 
     this.state = {
       customers: [],
-      selected: null,
       customer: {},
+      selected: undefined,
       showModal: false,
+      showEditModal: false,
       showDeleteModal: false,
-      showEditModal: false
     };
 
     this.closeModal = this.closeModal.bind(this);
@@ -32,11 +32,11 @@ export default class Customers extends Component {
   openModal(selected, e) {
     const modalType = e.target.innerHTML;
     if (modalType === 'Create') {
-       this.setState({ showModal: true });
-    } else if (modalType === 'delete') {
-      this.setState({ showDeleteModal: true, selected });
+      this.setState({ showModal: true });
     } else if (modalType === 'edit') {
       this.setState({ showEditModal: true, customer: selected });
+    } else if (modalType === 'delete') {
+      this.setState({ showDeleteModal: true, selected });
     }
   }
 
@@ -69,8 +69,8 @@ export default class Customers extends Component {
           <Button onClick={this.openModal.bind(this, this)} style={{ marginTop: '23px', marginLeft: '25px' }}>Create</Button>
 
           <CreateModal showModal={this.state.showModal} closeModal={this.closeModal} customers={this.state.customers} updateCustomers={this.updateCustomers} page='Customers' />
-          <DeleteModal showModal={this.state.showDeleteModal} closeModal={this.closeModal} customers={this.state.customers} updateCustomers={this.updateCustomers} selected={this.state.selected} page='Customers' />
-          <EditModal showModal={this.state.showEditModal} closeModal={this.closeModal} customers={this.state.customers} updateCustomers={this.updateCustomers} customer={this.state.customer} page='Customers' />
+          <DeleteModal showModal={this.state.showDeleteModal} closeModal={this.closeModal} customers={this.state.customers} selected={this.state.selected} page='customers' />
+          <EditModal showModal={this.state.showEditModal} closeModal={this.closeModal} customers={this.state.customers} customer={this.state.customer} page='Customers' />
 
           <Table responsive>
             <thead>

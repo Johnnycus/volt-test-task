@@ -39,7 +39,7 @@ export default class CreateModal extends Component {
   }
 
   render() {
-    const page = this.props.page;
+    const { page } = this.props;
 
     let pageType;
     if (page === 'Customers') {

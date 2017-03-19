@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
+import { findDOMNode } from 'react-dom';
 import { Button, Modal, FormGroup, FormControl } from 'react-bootstrap';
 
 export default class EditModal extends Component {
@@ -10,16 +10,13 @@ export default class EditModal extends Component {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        name: ReactDOM.findDOMNode(this.refs.name).value,
-        address: ReactDOM.findDOMNode(this.refs.address).value,
-        phone: ReactDOM.findDOMNode(this.refs.phone).value
+        name: findDOMNode(this.refs.name).value,
+        address: findDOMNode(this.refs.address).value,
+        phone: findDOMNode(this.refs.phone).value
       })
     })
 
-    // Idk why, but fetch customers to show new state (customers list with edited customer) doesn't work so just page reload here
-    // fetch('/api/customers')
-    //   .then(response => response.json())
-    //   .then(customers => this.props.updateCustomers(customers));
+    // Can't make it work in a way that after edit - new state shows up (with edited customer), so just page reload here
     window.location.reload();
   }
 
@@ -30,22 +27,17 @@ export default class EditModal extends Component {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        name: ReactDOM.findDOMNode(this.refs.name).value,
-        price: ReactDOM.findDOMNode(this.refs.price).value
+        name: findDOMNode(this.refs.name).value,
+        price: findDOMNode(this.refs.price).value
       })
     })
 
-    // Idk why, but fetch products to show new state (products list with edited product) doesn't work so just page reload here
-    // fetch('/api/customers')
-    //   .then(response => response.json())
-    //   .then(products => this.props.updateProducts(products));
+    // Can't make it work in a way that after edit - new state shows up (with edited product), so just page reload here
     window.location.reload();
   }
 
   render() {
-    const page = this.props.page;
-    const customer = this.props.customer;
-    const product = this.props.product;
+    const { page, customer, product, showModal, closeModal } = this.props;
 
     let pageType;
     if (page === 'Customers') {
@@ -79,7 +71,7 @@ export default class EditModal extends Component {
     }
 
     return (
-      <Modal show={this.props.showModal} onHide={this.props.closeModal}>
+      <Modal show={showModal} onHide={closeModal}>
         <Modal.Header closeButton>
           <Modal.Title>Edit {page === 'Customers' ? 'customer' : 'product'} #{page === 'Customers' ? customer.id : product.id}</Modal.Title>
         </Modal.Header>
@@ -90,7 +82,7 @@ export default class EditModal extends Component {
 
         <Modal.Footer>
           <Button bsStyle="success" onClick={page === 'Customers' ? this.editCustomer.bind(this) : this.editProduct.bind(this)}>Save</Button>
-          <Button onClick={this.props.closeModal}>Cancel</Button>
+          <Button onClick={closeModal}>Cancel</Button>
         </Modal.Footer>
       </Modal>
     );

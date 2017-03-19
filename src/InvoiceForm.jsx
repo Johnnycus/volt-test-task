@@ -13,28 +13,39 @@ export default class InvoiceForm extends Component {
     this.state = {
       selectedCustomer: undefined,
       selectedProduct: undefined,
+      selectedInvoice: undefined,
       selectedProducts: [],
+      discount: 0,
       total: 0
     }
 
     this.clearSelect = this.clearSelect.bind(this);
     this.handleCustomers = this.handleCustomers.bind(this);
     this.handleProducts = this.handleProducts.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
     this.addProduct = this.addProduct.bind(this);
+    this.createInvoice = this.createInvoice.bind(this);
+    this.editInvoice = this.editInvoice.bind(this);
+    this.onApply = this.onApply.bind(this);
+  }
+
+  componentDidMount() {
+    const { id } = this.props.match.params;
+    if (id) {
+      fetch(`/api/invoices/${id}`)
+        .then(response => response.json())
+        .then(invoice => this.setState({ selectedInvoice: invoice, selectedCustomer: invoice.customer_id, discount: invoice.discount, total: invoice.total }));
+    }
   }
 
   clearSelect(type) {
-    if (type === 'Customer') {
-      this.setState({ selectedCustomer: undefined });
-    } else {
-      this.setState({ selectedProduct: undefined });
-    }
+    this.setState(type === 'Customer' ? { selectedCustomer: undefined } : { selectedProduct: undefined });
   }
 
   handleCustomers(e) {
     this.clearSelect('Customer');
     if (e != null) {
-      this.setState({ selectedCustomer: e.value });
+      this.setState({ selectedCustomer: e });
     }
   }
 
@@ -46,93 +57,29 @@ export default class InvoiceForm extends Component {
   }
 
   addProduct() {
-    const { selectedProduct, selectedProducts, total } = this.state;
-    if (selectedProduct) {
-      const newSelectedProducts = selectedProducts.slice();
-      const duplicate = new Set();
-      newSelectedProducts.push(selectedProduct);
-      const hasDuplicates = newSelectedProducts.some(function(currentObj) {
-        return duplicate.size === duplicate.add(currentObj.name).size;
-      });
-      if (!hasDuplicates) {
-        this.setState({ selectedProducts: newSelectedProducts });
-      } else {
-        // let duplicate = [];
-        // selectedProducts.filter((arr, i) => {
-        //   if (arr == selectedProduct){
-        //     duplicate.push(i);
-        //   }
-        // });
-        // this.setState({ selectedProduct, selectedProducts: newSelectedProducts, tota: total + (selectedProduct.price * selectedProduct.quantity) });
-
-        let newSelectedProduct = selectedProduct;
-        newSelectedProduct.quantity = selectedProduct.quantity ? selectedProduct.quantity + 1 : 1 + 1;
-        let uniq = () => [...new Set(newSelectedProducts)];
-        let uniqSelectedProducts = uniq();
-
-        // console.log(newSelectedProduct.quantity);
-
-        this.setState({ selectedProduct: newSelectedProduct, selectedProducts: uniqSelectedProducts });
-      }
+    const { selectedProduct, selectedProducts } = this.state;
+    const newSelectedProducts = selectedProducts.slice();
+    const duplicate = new Set();
+    newSelectedProducts.push(selectedProduct);
+    const hasDuplicates = newSelectedProducts.some(function(currentObj) {
+      return duplicate.size === duplicate.add(currentObj.name).size;
+    });
+    if (!hasDuplicates) {
+      this.setState({ selectedProducts: newSelectedProducts });
     }
   }
 
-  handleChange(e) {
-    // const { total, selectedProduct, selectedProducts } = this.state;
-    // let quantityValues = this.state.quantityValues;
-    // let name = e.target.name;
-    // let value = e.target.value;
-    // let obj = {};
-
-    // obj[name] = value;
-
-    // quantityValues.push(obj);
-    // if (quantityValues.length > 1) {
-    //   quantityValues.shift();
-    // }
-
-    // var quantities = {};
-    // var newValues = quantityValues.reverse().filter(function(entry) {
-    //   if (quantities[entry.name]) {
-    //       return false;
-    //   }
-    //   quantities[entry.name] = true;
-    //   return true;
-    // });
-    // let totalPrice = 0;
-    // let quantity = findDOMNode(this.refs[`quantity-${selectedProduct.name}`]).value;
-    // totalPrice += selectedProduct.price*quantity;
-    // console.log(totalPrice);
-
-    // this.setState({ quantityValues, total: totalPrice });
-  }
-
-   handleInputChange(e, product) {
-    // const target = e.target;
-    // const value = target.value;
-    // const name = target.name;
-    // this.setState({
-    //   [name]: value
-    // });
+  handleInputChange(e) {
     const name = e.refs.quantity.name;
     const quantity = +e.refs.quantity.value;
-    const price = product.price;
     const newSelectedProducts = this.state.selectedProducts;
+
     newSelectedProducts.forEach(function(obj) {
       if (obj.name == name) {
         obj.quantity = quantity;
       }
     });
     this.setState({ selectedProducts: newSelectedProducts });
-    // console.log(this.state.selectedProducts);
-
-    // const newState = this.state;
-    // newState.forEach(function(obj) {
-    //   if (obj.name == name) {
-    //     obj.quantity = quantity;
-    //   }
-    // });
-    // this.setState({[name]: quantity})
   }
 
   onApply() {
@@ -143,16 +90,50 @@ export default class InvoiceForm extends Component {
       total += obj.price * obj.quantity;
     });
     const totalDiscount = (discount/100) * total;
-    this.setState({ total: total-totalDiscount });
+    total = total-totalDiscount;
+    this.setState({ total: total.toFixed(2), discount });
+  }
+
+  createInvoice() {
+    this.refs.invoice.createInvoiceItem();
+    fetch('/api/invoices', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        customer_id: this.state.selectedCustomer.value,
+        discount: +this.state.discount,
+        total: +this.state.total
+      })
+    })
+    .then(window.location = '/invoices');
+  }
+
+  editInvoice() {
+    fetch(`/api/invoices/${this.props.match.params.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        customer_id: this.state.selectedCustomer.value,
+        discount: +this.state.discount,
+        total: +this.state.total
+      })
+    })
+    .then(window.location = '/invoices');
   }
 
   render() {
+    const { id } = this.props.match.params;
+    const title = id ? `Edit invoice #${id}` : 'Create Invoice';
     const getData = (type) => {
       return fetch(`/api/${type}`)
         .then((response) => {
           return response.json();
         }).then((data) => {
-          data.forEach(function(obj) {
+          data.forEach(obj => {
             obj.label = obj.name;
             obj.value = obj.name;
             if (type === 'products') {
@@ -162,20 +143,22 @@ export default class InvoiceForm extends Component {
           return { options: data };
         });
     }
+    const customerValue = this.state.selectedCustomer ? this.state.selectedCustomer.value : '';
+    const productValue = this.state.selectedProduct ? this.state.selectedProduct.value : '';
 
     return (
-      <DocumentTitle title='Create Invoice'>
+      <DocumentTitle title={title}>
         <div className="container" >
-          <h1>Create Invoice</h1>
+          <h1>{title}</h1>
 
           <form>
             <label style={{ display: 'block' }}>Discount (%)</label>
-            <input type="number" ref="discount" min="1" step="1" defaultValue="0" />
+            <input type="number" ref="discount" min="1" step="1" value={this.state.discount} onChange={(e) => this.setState({ discount: e.target.value })} />
 
             <label style={{ display: 'block' }}>Customer</label>
             <Select.Async
               name="customer"
-              value={this.state.selectedCustomer}
+              value={id ? this.state.selectedCustomer : customerValue}
               loadOptions={() => getData('customers')}
               onChange={this.handleCustomers}
               style={{ width: '300px' }}
@@ -184,14 +167,13 @@ export default class InvoiceForm extends Component {
             <label style={{ display: 'block' }}>Add product</label>
             <Select.Async
               name="product"
-              value={this.state.selectedProduct ? this.state.selectedProduct.value : ''}
+              value={productValue}
               loadOptions={() => getData('products')}
               onChange={this.handleProducts}
               style={{ width: '220px', float: 'left' }}
               className="Select-products"
             />
-            <Button onClick={this.addProduct} style={{ marginLeft: '30px', float: 'left' }}>Add</Button>
-            <Button onClick={this.onApply.bind(this)} style={{ marginLeft: '10px', float: 'left' }} bsStyle="primary">Apply</Button>
+            <Button onClick={this.addProduct} style={{ marginLeft: '30px', float: 'left' }} disabled={!this.state.selectedProduct}>Add</Button>
           </form>
 
           <Table responsive>
@@ -202,12 +184,12 @@ export default class InvoiceForm extends Component {
                 <th>Qty</th>
               </tr>
             </thead>
-
-              <InvoiceItem selectedProducts={this.state.selectedProducts} handleInputChange={this.handleInputChange.bind(this)} />
-
+            <InvoiceItem selectedProducts={this.state.selectedProducts} handleInputChange={this.handleInputChange} ref="invoice" />
           </Table>
 
-          <h1>Total: ${this.state.total.toFixed(2)}</h1>
+          <Button onClick={id ? this.editInvoice : this.createInvoice} style={{ float: 'right', width: '125px', fontSize: '16px', marginLeft: '10px'}} bsStyle="success" disabled={!this.state.selectedCustomer}>Save Invoice</Button>
+          <Button onClick={this.onApply} style={{ float: 'right', width: '125px', fontSize: '16px' }} bsStyle="primary" disabled={!this.state.selectedProducts[0]}>Apply</Button>
+          <h1>Total: ${this.state.total}</h1>
         </div>
       </DocumentTitle>
     );

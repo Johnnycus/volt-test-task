@@ -12,7 +12,7 @@ export default class Products extends Component {
 
     this.state = {
       products: [],
-      selected: null,
+      selected: undefined,
       product: {},
       showModal: false,
       showDeleteModal: false,
@@ -68,7 +68,7 @@ export default class Products extends Component {
           <Button onClick={this.openModal.bind(this, this)} style={{ marginTop: '23px', marginLeft: '25px' }}>Create</Button>
 
           <CreateModal showModal={this.state.showModal} closeModal={this.closeModal} products={this.state.products} updateProducts={this.updateProducts} page='Products' />
-          <DeleteModal showModal={this.state.showDeleteModal} closeModal={this.closeModal} products={this.state.products} updateProducts={this.updateProducts} selected={this.state.selected} page='Products' />
+          <DeleteModal showModal={this.state.showDeleteModal} closeModal={this.closeModal} products={this.state.products} updateProducts={this.updateProducts} selected={this.state.selected} page='products' />
           <EditModal showModal={this.state.showEditModal} closeModal={this.closeModal} products={this.state.products} updateProducts={this.updateProducts} product={this.state.product} page='Products' />
 
           <Table responsive>
