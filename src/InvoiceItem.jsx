@@ -20,8 +20,7 @@ export default class InvoiceItem extends Component {
       <tr key={product.id}>
         <td>{product.name}</td>
         <td>${product.price}</td>
-        <td><input name={product.name} value={this.props.quantityValues["name"]} type="number" ref="quantity" min="1" step="1" /></td>
-        <td><a onClick={this.handleChange.bind(this)}>apply</a></td>
+        <td><input name={product.name} onChange={() => this.props.handleInputChange(this, product)} defaultValue="1" type="number" ref="quantity" min="0" step="1" /></td>
       </tr>
     );
 

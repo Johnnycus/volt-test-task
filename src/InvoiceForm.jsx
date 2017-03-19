@@ -14,7 +14,6 @@ export default class InvoiceForm extends Component {
       selectedCustomer: undefined,
       selectedProduct: undefined,
       selectedProducts: [],
-      quantityValues: [],
       total: 0
     }
 
@@ -71,7 +70,7 @@ export default class InvoiceForm extends Component {
         let uniq = () => [...new Set(newSelectedProducts)];
         let uniqSelectedProducts = uniq();
 
-        console.log(newSelectedProduct.quantity);
+        // console.log(newSelectedProduct.quantity);
 
         this.setState({ selectedProduct: newSelectedProduct, selectedProducts: uniqSelectedProducts });
       }
@@ -79,8 +78,8 @@ export default class InvoiceForm extends Component {
   }
 
   handleChange(e) {
-    const { total, selectedProduct, selectedProducts } = this.state;
-    let quantityValues = this.state.quantityValues;
+    // const { total, selectedProduct, selectedProducts } = this.state;
+    // let quantityValues = this.state.quantityValues;
     // let name = e.target.name;
     // let value = e.target.value;
     // let obj = {};
@@ -100,12 +99,51 @@ export default class InvoiceForm extends Component {
     //   quantities[entry.name] = true;
     //   return true;
     // });
-    let totalPrice = 0;
-    let quantity = findDOMNode(this.refs[`quantity-${selectedProduct.name}`]).value;
-    totalPrice += selectedProduct.price*quantity;
-    console.log(totalPrice);
+    // let totalPrice = 0;
+    // let quantity = findDOMNode(this.refs[`quantity-${selectedProduct.name}`]).value;
+    // totalPrice += selectedProduct.price*quantity;
+    // console.log(totalPrice);
 
-    this.setState({ quantityValues, total: totalPrice });
+    // this.setState({ quantityValues, total: totalPrice });
+  }
+
+   handleInputChange(e, product) {
+    // const target = e.target;
+    // const value = target.value;
+    // const name = target.name;
+    // this.setState({
+    //   [name]: value
+    // });
+    const name = e.refs.quantity.name;
+    const quantity = +e.refs.quantity.value;
+    const price = product.price;
+    const newSelectedProducts = this.state.selectedProducts;
+    newSelectedProducts.forEach(function(obj) {
+      if (obj.name == name) {
+        obj.quantity = quantity;
+      }
+    });
+    this.setState({ selectedProducts: newSelectedProducts });
+    // console.log(this.state.selectedProducts);
+
+    // const newState = this.state;
+    // newState.forEach(function(obj) {
+    //   if (obj.name == name) {
+    //     obj.quantity = quantity;
+    //   }
+    // });
+    // this.setState({[name]: quantity})
+  }
+
+  onApply() {
+    let total = 0;
+    const discount = findDOMNode(this.refs.discount).value;
+    const products = this.state.selectedProducts;
+    products.forEach(function(obj) {
+      total += obj.price * obj.quantity;
+    });
+    const totalDiscount = (discount/100) * total;
+    this.setState({ total: total-totalDiscount });
   }
 
   render() {
@@ -115,21 +153,15 @@ export default class InvoiceForm extends Component {
           return response.json();
         }).then((data) => {
           data.forEach(function(obj) {
-            obj['label'] = obj.name;
-            obj['value'] = obj.name;
+            obj.label = obj.name;
+            obj.value = obj.name;
+            if (type === 'products') {
+              obj.quantity = 1;
+            }
           });
           return { options: data };
         });
     }
-
-    const products = this.state.selectedProducts.map(product =>
-      <tr key={product.id}>
-        <td>{product.name}</td>
-        <td>${product.price}</td>
-        <td><input ref={`quantity-${product.name}`} name={product.name} value={this.state.quantityValues["name"]} type="number" min="1" step="1" /></td>
-        <td><a onClick={this.handleChange.bind(this)}>apply</a></td>
-      </tr>
-    );
 
     return (
       <DocumentTitle title='Create Invoice'>
@@ -138,7 +170,7 @@ export default class InvoiceForm extends Component {
 
           <form>
             <label style={{ display: 'block' }}>Discount (%)</label>
-            <input type="number" ref="discount" min="1" step="1" />
+            <input type="number" ref="discount" min="1" step="1" defaultValue="0" />
 
             <label style={{ display: 'block' }}>Customer</label>
             <Select.Async
@@ -159,6 +191,7 @@ export default class InvoiceForm extends Component {
               className="Select-products"
             />
             <Button onClick={this.addProduct} style={{ marginLeft: '30px', float: 'left' }}>Add</Button>
+            <Button onClick={this.onApply.bind(this)} style={{ marginLeft: '10px', float: 'left' }} bsStyle="primary">Apply</Button>
           </form>
 
           <Table responsive>
@@ -169,13 +202,12 @@ export default class InvoiceForm extends Component {
                 <th>Qty</th>
               </tr>
             </thead>
-            <tbody>
-              {products}
-            </tbody>
+
+              <InvoiceItem selectedProducts={this.state.selectedProducts} handleInputChange={this.handleInputChange.bind(this)} />
+
           </Table>
 
           <h1>Total: ${this.state.total.toFixed(2)}</h1>
-          <a>apply</a>
         </div>
       </DocumentTitle>
     );
